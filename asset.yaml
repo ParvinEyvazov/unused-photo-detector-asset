@@ -1,0 +1,73 @@
+# IMAGE DETECTOR DASHBOARD
+apiVersion: dashboard/v1
+kind: Dashboard
+metadata:
+  name: image-dashboard
+spec:
+  name: Image Detector
+  icon: collections
+  components:
+    - name: detect
+      url: api:/fn-execute/unusedImageDetect
+      type: card
+---
+# API KEY
+apiVersion: passport/v1
+kind: ApiKey
+metadata:
+  name: image-detector-apikey
+spec:
+  name: Secret Api Key For Image Detector
+  policies:
+    - StorageFullAccess
+    - BucketFullAccess
+---
+# FUNCTION DETECTOR
+apiVersion: function/v1
+kind: Function
+metadata:
+  name: image-detector
+spec:
+  title: Detect unused image
+  description: "Detect unused images in your storage"
+  timeout: 120
+  code: ./function/detector.js
+  runtime:
+    name: Node
+    language: Javascript
+  environment:
+    - name: AUTH_APIKEY
+      valueFrom:
+        resourceFieldRef:
+          apiKeyName: image-detector-apikey
+  dependency:
+    - name: "@spica-devkit/bucket"
+      version: latest
+    - name: "@spica-devkit/database"
+      version: latest
+---
+# TRIGGER - initialize
+apiVersion: function/v1
+kind: Trigger
+metadata:
+  name: detector-dashboard
+spec:
+  name: initialize
+  func: image-detector
+  type: http
+  httpOptions:
+    method: Get
+    path: /unusedImageDetect
+---
+# TRIGGER - cleaner
+apiVersion: function/v1
+kind: Trigger
+metadata:
+  name: image-deleter
+spec:
+  name: remove
+  func: image-detector
+  type: http
+  httpOptions:
+    method: Get
+    path: /unusedImageRemove
