@@ -43,7 +43,7 @@ spec:
   dependency:
     - name: "@spica-devkit/bucket"
       version: latest
-    - name: "@spica-devkit/database"
+    - name: "node-fetch"
       version: latest
 ---
 # TRIGGER - initialize
@@ -59,15 +59,28 @@ spec:
     method: Get
     path: /unusedImageDetect
 ---
-# TRIGGER - cleaner
+# TRIGGER - clean all storage data
 apiVersion: function/v1
 kind: Trigger
 metadata:
-  name: image-deleter
+  name: all-storage-data-remover
 spec:
-  name: remove
+  name: cleanAllStorageData
   func: image-detector
   type: http
   httpOptions:
     method: Get
-    path: /unusedImageRemove
+    path: /clean-all-storage-data
+---
+# TRIGGER - clean unused storage data
+apiVersion: function/v1
+kind: Trigger
+metadata:
+  name: unused-storage-data-remover
+spec:
+  name: cleanUnusedStorageData
+  func: image-detector
+  type: http
+  httpOptions:
+    method: Get
+    path: /clean-unused-storage-data
