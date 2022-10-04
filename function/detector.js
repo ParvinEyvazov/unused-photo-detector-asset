@@ -1,5 +1,5 @@
 import * as Bucket from "@spica-devkit/bucket";
-const fetch = require("node-fetch");
+import fetch from 'node-fetch';
 
 const PUBLIC_URL = process.env.__INTERNAL__SPICA__PUBLIC_URL__;
 const AUTH_APIKEY = process.env.AUTH_APIKEY;
